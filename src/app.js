@@ -3,14 +3,10 @@ const connectDB = require("./config/database");
 const User = require("./models/User");
 
 const app = express(); // here i am creating a express.js application
+app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  const user = new User({
-    firstName: "Yuv",
-    lastName: "Dholia",
-    emailId: "jsbfkjsdhjfk@abc.com",
-    password: "abc123",
-  });
+  const user = new User(req.body);
   // creating a new instance of the user model
 
   await user.save();
@@ -18,6 +14,31 @@ app.post("/signup", async (req, res) => {
     res.send("User added successfully");
   } catch (err) {
     res.status(400).send("Error in saving the user:" + err.message);
+  }
+});
+
+// Finding a user by its emailId
+
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.emailId;
+  try {
+    const users = await User.findOne({ emailId: userEmail });
+    if (users.length === 0) {
+      res.status(404).send("User not found");
+    } else {
+      res.send(users);
+    }
+  } catch (err) {
+    res.status(500).send("Something went wrong");
+  }
+});
+
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (err) {
+    res.status(500).send("Something went wrong");
   }
 });
 
