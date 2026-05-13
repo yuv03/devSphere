@@ -18,6 +18,11 @@ const userSchema = new Schema(
       trim: true,
       required: true,
       unique: true,
+      validate(value) {
+        if (validator.isEmail(value)) {
+          throw new Error("Invalid email address: " + value);
+        }
+      },
     },
     password: {
       type: String,
@@ -36,6 +41,11 @@ const userSchema = new Schema(
     },
     photoUrl: {
       type: String,
+      validate(value) {
+        if (validator.isUrl(value)) {
+          throw new Error("Invalid url address: " + value);
+        }
+      },
     },
     about: {
       type: String,
