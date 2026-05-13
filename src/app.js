@@ -1,11 +1,15 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/User");
+const { validateSignUpData } = require("./utils/validation");
 
 const app = express(); // here i am creating a express.js application
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
+  // Validation of data
+  validateSignUpData(req);
+
   const user = new User(req.body);
   // creating a new instance of the user model
 
@@ -13,7 +17,7 @@ app.post("/signup", async (req, res) => {
   try {
     res.send("User added successfully");
   } catch (err) {
-    res.status(400).send("Error in saving the user:" + err.message);
+    res.status(400).send("ERROR: " + err.message);
   }
 });
 
