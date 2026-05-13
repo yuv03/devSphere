@@ -59,11 +59,10 @@ const userSchema = new Schema(
     },
     skills: {
       type: [String],
-      validate: {
-        validator: function (value) {
-          return value.length <= 10;
-        },
-        message: "Skills cannot be more than 10",
+      validate(value) {
+        if (value.length > 10) {
+          throw new Error("Skills cannot be more than 10");
+        }
       },
     },
   },
