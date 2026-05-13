@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/User");
 const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 const app = express(); // here i am creating a express.js application
 app.use(express.json());
@@ -10,7 +11,16 @@ app.post("/signup", async (req, res) => {
   // Validation of data
   validateSignUpData(req);
 
-  const user = new User(req.body);
+  const { firstName, lastName, emailId, password } = req.body;
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = new User({
+    firstName,
+    lastName,
+    emailId,
+    password: hashedPassword,
+  });
   // creating a new instance of the user model
 
   await user.save();
