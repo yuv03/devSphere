@@ -77,6 +77,15 @@ app.get("/profile", userAuth, async (req, res) => {
   }
 });
 
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    res.send(user.firstName + " sent the connection request");
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
 // Finding a user by its emailId
 
 app.get("/user", async (req, res) => {
