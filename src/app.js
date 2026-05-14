@@ -55,7 +55,9 @@ app.post("/login", async (req, res) => {
     } else {
       // create a JWT token
 
-      const token = jwt.sign({ _id: user._id }, "DevSphere@%123");
+      const token = jwt.sign({ _id: user._id }, "DevSphere@%123", {
+        expiresIn: "1d",
+      });
 
       // Add the token to cookie and send the response back to the user
       res.cookie("token", token).send("Login Successful!!");
