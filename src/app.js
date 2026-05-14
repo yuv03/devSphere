@@ -55,9 +55,7 @@ app.post("/login", async (req, res) => {
     } else {
       // create a JWT token
 
-      const token = jwt.sign({ _id: user._id }, "DevSphere@%123", {
-        expiresIn: "1d",
-      });
+      const token = await user.getJWT();
 
       // Add the token to cookie and send the response back to the user
       res
@@ -65,8 +63,6 @@ app.post("/login", async (req, res) => {
           expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
         })
         .send("Login Successful!!");
-
-      // res.send("Login Successful!!");
     }
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
