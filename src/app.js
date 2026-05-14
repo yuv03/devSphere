@@ -4,9 +4,12 @@ const User = require("./models/User");
 const validator = require("validator");
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const app = express(); // here i am creating a express.js application
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   // Validation of data
@@ -49,8 +52,42 @@ app.post("/login", async (req, res) => {
     if (!isPasswordValid) {
       throw new Error("Invalid Credentials");
     } else {
-      res.send("Login Successful!!");
+      // create a JWT token
+
+      const token = jwt.sign({ _id: user._id }, "DevSphere@%123");
+
+      // Add the token to cookie and send the response back to the user
+      res.cookie("token", token).send("Login Successful!!");
+
+      // res.send("Login Successful!!");
     }
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+
+    const { token } = cookies;
+
+    if (!token) {
+      throw new Error("Invalid token");
+    }
+
+    // Validate the token
+    const decodedMessage = await jwt.verify(token, "DevSphere@%123");
+
+    console.log(decodedMessage);
+    const { _id } = decodedMessage;
+    const user = await User.findById(_id);
+
+    if (!user) {
+      throw new Error("User does not exist");
+    }
+
+    res.send(user);
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
