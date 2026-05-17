@@ -1,9 +1,9 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/User");
-const validator = require("validator");
+
 const { validateSignUpData } = require("./utils/validation");
-const bcrypt = require("bcrypt");
+
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const { userAuth } = require("./middlewares/auth");
@@ -12,81 +12,9 @@ const app = express(); // here i am creating a express.js application
 app.use(express.json());
 app.use(cookieParser());
 
-app.post("/signup", async (req, res) => {
-  // Validation of data
-  validateSignUpData(req);
-
-  const { firstName, lastName, emailId, password } = req.body;
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = new User({
-    firstName,
-    lastName,
-    emailId,
-    password: hashedPassword,
-  });
-  // creating a new instance of the user model
-
-  await user.save();
-  try {
-    res.send("User added successfully");
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-});
-
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
-    if (!validator.isEmail(emailId)) {
-      throw new Error("Invalid Credentials");
-    }
-
-    const user = await User.findOne({ emailId });
-    if (!user) {
-      throw new Error("Invalid Credentials");
-    }
-
-    const isPasswordValid = await user.validatePassword(password);
-
-    if (!isPasswordValid) {
-      throw new Error("Invalid Credentials");
-    } else {
-      // create a JWT token
-
-      const token = await user.getJWT();
-
-      // Add the token to cookie and send the response back to the user
-      res
-        .cookie("token", token, {
-          expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
-        })
-        .send("Login Successful!!");
-    }
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-});
-
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-    const { user } = req;
-    console.log("user: " + user);
-    res.send(user);
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-});
-
-app.post("/sendConnectionRequest", userAuth, async (req, res) => {
-  try {
-    const user = req.user;
-    res.send(user.firstName + " sent the connection request");
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-});
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestsRouter = require("./routes/requests");
 
 // Finding a user by its emailId
 
