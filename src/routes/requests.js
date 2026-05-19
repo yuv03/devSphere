@@ -16,18 +16,18 @@ requestRouter.post(
       const ALLOWED_STATUS = ["interested", "ignored"];
 
       if (!ALLOWED_STATUS.includes(status)) {
-        res.status(400).json({ message: "Invalid user type" });
+        res.status(400).json({ message: "Invalid status type" + status });
       }
 
-      const ConnectionRequest = new ConnectionRequestModel({
+      const connectionRequest = new ConnectionRequest({
         fromUserId,
         toUserId,
         status,
       });
 
-      const connection = await ConnectionRequest.save();
+      const data = await connectionRequest.save();
 
-      res.json({ message: "Connection Request sent Successfully", connection });
+      res.json({ message: "Connection Request sent Successfully", data });
     } catch (err) {
       res.status(400).send("ERROR: " + err.message);
     }
