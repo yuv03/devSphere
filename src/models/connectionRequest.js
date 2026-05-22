@@ -26,6 +26,7 @@ const connectionRequestSchema = new mongoose.Schema(
 
 // ConnectionRequest.find({fromUserId: 234938459834734, toUserId: 986908456490590})
 // So if we make a query on DB which involves both the from and to user ids, that request will become very fast now
+// BTS : MongoDB builds a B-tree index internally so instead of scanning every document the DB searches the B-Tree.
 connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
 
 connectionRequestSchema.pre("save", function () {
